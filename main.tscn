@@ -1,0 +1,42 @@
+[gd_scene load_steps=8 format=3 uid="uid://djhcr2t2l1pe7"]
+
+[ext_resource type="Script" path="res://main.gd" id="1_gsq8u"]
+[ext_resource type="Script" path="res://TileParent.gd" id="2_gj76r"]
+[ext_resource type="PackedScene" uid="uid://ciejuqhii2jjr" path="res://ray_cast_3d.tscn" id="2_rfcby"]
+[ext_resource type="PackedScene" uid="uid://de3k7e2ho4kyv" path="res://menu.tscn" id="3_q60bj"]
+
+[sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_gwhv2"]
+sky_horizon_color = Color(0.64625, 0.65575, 0.67075, 1)
+ground_horizon_color = Color(0.64625, 0.65575, 0.67075, 1)
+
+[sub_resource type="Sky" id="Sky_pnc8p"]
+sky_material = SubResource("ProceduralSkyMaterial_gwhv2")
+
+[sub_resource type="Environment" id="Environment_ip1op"]
+background_mode = 2
+sky = SubResource("Sky_pnc8p")
+
+[node name="main" type="Node3D"]
+script = ExtResource("1_gsq8u")
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
+environment = SubResource("Environment_ip1op")
+
+[node name="CameraParentY" type="Node3D" parent="."]
+transform = Transform3D(0.707107, 0, 0.707107, 0, 1, 0, -0.707107, 0, 0.707107, 0, 0, 0)
+
+[node name="CameraParentX" type="Node3D" parent="CameraParentY"]
+transform = Transform3D(1, 0, 0, 0, 0.866025, 0.5, 0, -0.5, 0.866025, 0, 0, 0)
+
+[node name="Camera3D" type="Camera3D" parent="CameraParentY/CameraParentX"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 8)
+
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="CameraParentY/CameraParentX/Camera3D"]
+transform = Transform3D(0.28266, -0.598634, 0.749494, 0.47961, 0.764877, 0.430044, -0.830709, 0.237909, 0.503311, 0, 0, 0)
+
+[node name="TileParent" type="Node3D" parent="."]
+script = ExtResource("2_gj76r")
+
+[node name="RayCast3D" parent="." instance=ExtResource("2_rfcby")]
+
+[node name="menu" parent="." instance=ExtResource("3_q60bj")]

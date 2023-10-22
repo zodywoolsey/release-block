@@ -1,0 +1,15 @@
+[gd_scene load_steps=3 format=3 uid="uid://djhcr2t2l1pe7"]
+
+[ext_resource type="Script" path="res://main.gd" id="1_gsq8u"]
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_5epqw"]
+lightmap_size_hint = Vector2i(17, 19)
+top_radius = 0.0
+radial_segments = 4
+rings = 10
+
+[node name="main" type="Node3D"]
+script = ExtResource("1_gsq8u")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="."]
+mesh = SubResource("CylinderMesh_5epqw")

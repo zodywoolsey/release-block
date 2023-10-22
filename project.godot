@@ -1,0 +1,36 @@
+; Engine configuration file.
+; It's best edited using the editor UI and not directly,
+; since the parameters that go here are not all obvious.
+;
+; Format:
+;   [section] ; section goes between []
+;   param=value ; assign values to parameters
+
+config_version=5
+
+[application]
+
+config/name="release block"
+run/main_scene="res://main.tscn"
+config/features=PackedStringArray("4.1", "Mobile")
+
+[display]
+
+window/size/initial_position_type=3
+window/size/resizable=false
+window/handheld/orientation=6
+
+[input_devices]
+
+pointing/emulate_touch_from_mouse=true
+
+[physics]
+
+2d/run_on_separate_thread=true
+common/max_physics_steps_per_frame=1
+
+[rendering]
+
+renderer/rendering_method="mobile"
+driver/threads/thread_model=2
+textures/vram_compression/import_etc2_astc=true
