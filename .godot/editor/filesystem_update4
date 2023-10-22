@@ -1,9 +1,0 @@
-res://main.tscn
-res://tile.tscn
-res://ray_cast_3d.tscn
-res://main.gd
-res://RayCast3D.gd
-res://tile.gd
-res://menu.tscn
-res://menu.gd
-res://TileParent.gd
