@@ -18,7 +18,7 @@ config/features=PackedStringArray("4.1", "Mobile")
 
 window/size/initial_position_type=3
 window/size/resizable=false
-window/handheld/orientation=6
+window/handheld/orientation=1
 
 [input_devices]
 
