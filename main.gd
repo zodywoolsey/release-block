@@ -11,12 +11,6 @@ var rotating := false
 var drag_velocity := Vector2()
 
 func _input(event):
-	if event is InputEventMagnifyGesture:
-		print(event)
-	if event is InputEventKey and event.pressed and event.keycode == KEY_R:
-		for child in tile_parent.get_children():
-			child.queue_free()
-		init_board()
 	if event is InputEventScreenDrag:
 		rotating = true
 		if rotate_timer > .05:
