@@ -6,7 +6,7 @@ var timer = 0.0
 var type := ''
 
 func _ready():
-	get_tree().create_timer(2).timeout.connect(_check_solved)
+#	get_tree().create_timer(2).timeout.connect(_check_solved)
 #	animation_player.speed_scale = .5
 	animation_player.play_backwards("enter")
 
