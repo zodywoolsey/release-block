@@ -5,22 +5,23 @@
 [ext_resource type="PackedScene" uid="uid://ciejuqhii2jjr" path="res://ray_cast_3d.tscn" id="2_rfcby"]
 [ext_resource type="PackedScene" uid="uid://de3k7e2ho4kyv" path="res://menu.tscn" id="3_q60bj"]
 
-[sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_gwhv2"]
+[sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_gae30"]
 sky_horizon_color = Color(0.64625, 0.65575, 0.67075, 1)
 ground_horizon_color = Color(0.64625, 0.65575, 0.67075, 1)
 
-[sub_resource type="Sky" id="Sky_pnc8p"]
-sky_material = SubResource("ProceduralSkyMaterial_gwhv2")
+[sub_resource type="Sky" id="Sky_6nc1h"]
+sky_material = SubResource("ProceduralSkyMaterial_gae30")
 
-[sub_resource type="Environment" id="Environment_ip1op"]
+[sub_resource type="Environment" id="Environment_pq7i4"]
 background_mode = 2
-sky = SubResource("Sky_pnc8p")
+sky = SubResource("Sky_6nc1h")
+tonemap_mode = 2
 
 [node name="main" type="Node3D"]
 script = ExtResource("1_gsq8u")
 
 [node name="WorldEnvironment" type="WorldEnvironment" parent="."]
-environment = SubResource("Environment_ip1op")
+environment = SubResource("Environment_pq7i4")
 
 [node name="CameraParentY" type="Node3D" parent="."]
 transform = Transform3D(0.707107, 0, 0.707107, 0, 1, 0, -0.707107, 0, 0.707107, 0, 0, 0)

@@ -10,6 +10,8 @@ var rotate_timer := 0.0
 var rotating := false
 var drag_velocity := Vector2()
 
+var lasttime:int=0
+
 func _input(event):
 	if event is InputEventScreenDrag:
 		rotating = true
@@ -65,8 +67,8 @@ func _ready():
 #			tmp.offset = Vector2((x*20.0)-((raysize/2.0)*20.0),(y*20.0)-((raysize/2.0)*20.0))
 #	init_board()
 
-func init_board():
-#	seed(2)
+func init_board(new_size:=5):
+	seed(2)
 	randomize()
 #	size = randi_range(4, 10)
 	tile_parent.position = Vector3(-float(size)/2.0,-float(size)/2.0,-float(size)/2.0)
@@ -79,14 +81,21 @@ func init_board():
 			object_grid[i][a].resize(size)
 	for x in range(size):
 		for y in range(size):
-			await get_tree().process_frame
 			for z in range(size):
+				while lasttime+100 > Time.get_ticks_msec():
+					pass
+				lasttime = Time.get_ticks_msec()
 				while !object_grid[x][y][z]:
-					var choice :String= options.pick_random()
-					if check_choice(choice, x, y, z):
+					var go := false
+					var choice :String
+					while go == false:
+						choice = options.pick_random()
+						go = check_choice(choice,x,y,z)
+					if choice:
 						match choice:
 							"right":
 								var tmptile:Node3D = tile.instantiate()
+								tmptile.hide()
 								tile_parent.add_child(tmptile)
 								tmptile.rotation_degrees = Vector3(0,-90,0)
 								tmptile.position = Vector3(x,y,z)
@@ -94,6 +103,7 @@ func init_board():
 								object_grid[x][y][z] = choice
 							"left":
 								var tmptile:Node3D = tile.instantiate()
+								tmptile.hide()
 								tile_parent.add_child(tmptile)
 								tmptile.rotation_degrees = Vector3(0,90,0)
 								tmptile.position = Vector3(x,y,z)
@@ -101,6 +111,7 @@ func init_board():
 								object_grid[x][y][z] = choice
 							"up":
 								var tmptile:Node3D = tile.instantiate()
+								tmptile.hide()
 								tile_parent.add_child(tmptile)
 								tmptile.rotation_degrees = Vector3(90,0,0)
 								tmptile.position = Vector3(x,y,z)
@@ -108,6 +119,7 @@ func init_board():
 								object_grid[x][y][z] = choice
 							"down":
 								var tmptile:Node3D = tile.instantiate()
+								tmptile.hide()
 								tile_parent.add_child(tmptile)
 								tmptile.rotation_degrees = Vector3(-90,0,0)
 								tmptile.position = Vector3(x,y,z)
@@ -115,6 +127,7 @@ func init_board():
 								object_grid[x][y][z] = choice
 							"forward":
 								var tmptile:Node3D = tile.instantiate()
+								tmptile.hide()
 								tile_parent.add_child(tmptile)
 								tmptile.rotation_degrees = Vector3(0,180,0)
 								tmptile.position = Vector3(x,y,z)
@@ -122,6 +135,7 @@ func init_board():
 								object_grid[x][y][z] = choice
 							"backward":
 								var tmptile:Node3D = tile.instantiate()
+								tmptile.hide()
 								tile_parent.add_child(tmptile)
 								tmptile.rotation_degrees = Vector3(0,0,0)
 								tmptile.position = Vector3(x,y,z)
@@ -133,17 +147,17 @@ func init_board():
 func check_choice(cell_value, x, y, z) -> bool:
 	var go := false
 	if cell_value == 'right':
-		return solve_right(x,y,z,[])
+		go = solve_right(x,y,z,[])
 	elif cell_value == 'left':
-		return solve_left(x,y,z,[])
+		go = solve_left(x,y,z,[])
 	elif cell_value == 'up':
-		return solve_up(x,y,z,[])
+		go = solve_up(x,y,z,[])
 	elif cell_value == 'down':
-		return solve_down(x,y,z,[])
+		go = solve_down(x,y,z,[])
 	elif cell_value == 'forward':
-		return solve_forward(x,y,z,[])
+		go = solve_forward(x,y,z,[])
 	elif cell_value == 'backward':
-		return solve_backward(x,y,z,[])
+		go = solve_backward(x,y,z,[])
 	return go
 
 
@@ -152,57 +166,89 @@ func solve_right(x,y,z,origins:Array) -> bool:
 	if Vector3(x,y,z) in origins:
 		return false
 	if x == size-1:
-		return true
+		out = true
 	for a in size-x:
 		if Vector3(x,y,z) not in origins:
 			origins.append(Vector3(x,y,z))
 		match object_grid[x+a][y][z]:
 			'up':
-				return solve_up(x+a,y,z,origins)
+				if solve_up(x+a,y,z,origins):
+					out = true
+				else:
+					return false
 			'down':
-				return solve_down(x+a,y,z,origins)
+				if solve_down(x+a,y,z,origins):
+					out = true
+				else:
+					return false
 			'left':
 				return false
 			'right':
-				return solve_right(x+a,y,z,origins)
+				if solve_right(x+a,y,z,origins):
+					out = true
+				else:
+					return false
 			'forward':
-				return solve_forward(x+a,y,z,origins)
+				if solve_forward(x+a,y,z,origins):
+					out = true
+				else:
+					return false
 			'backward':
-				return solve_backward(x+a,y,z,origins)
-#			_:
-#				return true
-	return false
+				if solve_backward(x+a,y,z,origins):
+					out = true
+				else:
+					return false
+			null:
+				out = true
+	return out
 
 func solve_left(x,y,z,origins:Array) -> bool:
+	var out := false
 	if Vector3(x,y,z) in origins:
 		return false
 	if x == 0:
-		return true
+		out = true
 	for a in x+1:
 		if Vector3(x,y,z) not in origins:
 			origins.append(Vector3(x,y,z))
 		match object_grid[x-a-1][y][z]:
 			'up':
-				return solve_up(x-a-1,y,z,origins)
+				if solve_up(x-a-1,y,z,origins):
+					out = true
+				else:
+					return false
 			'down':
-				return solve_down(x-a-1,y,z,origins)
+				if solve_down(x-a-1,y,z,origins):
+					out = true
+				else:
+					return false
 			'left':
 				return false
 			'right':
-				return solve_right(x-a-1,y,z,origins)
+				if solve_right(x-a-1,y,z,origins):
+					out = true
+				else:
+					return false
 			'forward':
-				return solve_forward(x-a-1,y,z,origins)
+				if solve_forward(x-a-1,y,z,origins):
+					out = true
+				else:
+					return false
 			'backward':
-				return solve_backward(x-a-1,y,z,origins)
-#			_:
-#				return true
-	return false
+				if solve_backward(x-a-1,y,z,origins):
+					out = true
+				else:
+					return false
+			null:
+				out = true
+	return out
 
 func solve_down(x,y,z,origins:Array) -> bool:
+	var out := false
 	if Vector3(x,y,z) in origins:
 		return false
 	if z == 0:
-		return true
+		out = true
 	for a in y+1:
 		if Vector3(x,y,z) not in origins:
 			origins.append(Vector3(x,y,z))
@@ -210,90 +256,153 @@ func solve_down(x,y,z,origins:Array) -> bool:
 			'up':
 				return false
 			'down':
-				return solve_down(x,y-a-1,z,origins)
+				if solve_down(x,y-a-1,z,origins):
+					out = true
+				else:
+					return false
 			'left':
-				return solve_left(x,y-a-1,z,origins)
+				if solve_left(x,y-a-1,z,origins):
+					out = true
+				else:
+					return false
 			'right':
-				return solve_right(x,y-a-1,z,origins)
+				if solve_right(x,y-a-1,z,origins):
+					out = true
+				else:
+					return false
 			'forward':
-				return solve_forward(x,y-a-1,z,origins)
+				if solve_forward(x,y-a-1,z,origins):
+					out = true
+				else:
+					return false
 			'backward':
-				return solve_backward(x,y-a-1,z,origins)
-#			_:
-#				return true
-	return false
+				if solve_backward(x,y-a-1,z,origins):
+					out = true
+				else:
+					return false
+			null:
+				out = true
+	return out
 
 func solve_up(x,y,z,origins:Array) -> bool:
+	var out := false
 	if Vector3(x,y,z) in origins:
 		return false
 	if y == size-1:
-		return true
+		out = true
 	for a in size-y:
 		if Vector3(x,y,z) not in origins:
 			origins.append(Vector3(x,y,z))
 		match object_grid[x][y+a][z]:
 			'up':
-				return solve_up(x,y+a,z,origins)
+				if solve_up(x,y+a,z,origins):
+					out = true
+				else:
+					return false
 			'down':
 				return false
 			'left':
-				return solve_left(x,y+a,z,origins)
+				if solve_left(x,y+a,z,origins):
+					out = true
+				else:
+					return false
 			'right':
-				return solve_right(x,y+a,z,origins)
+				if solve_right(x,y+a,z,origins):
+					out = true
+				else:
+					return false
 			'forward':
-				return solve_forward(x,y+a,z,origins)
+				if solve_forward(x,y+a,z,origins):
+					out = true
+				else:
+					return false
 			'backward':
-				return solve_backward(x,y+a,z,origins)
-#			_:
-#				return true
-	return false
+				if solve_backward(x,y+a,z,origins):
+					out = true
+				else:
+					return false
+			null:
+				out = true
+	return out
 
 func solve_forward(x,y,z,origins:Array) -> bool:
+	var out := false
 	if Vector3(x,y,z) in origins:
 		return false
 	if z == size-1:
-		return true
+		out = true
 	for a in size-z:
 		if Vector3(x,y,z) not in origins:
 			origins.append(Vector3(x,y,z))
 		match object_grid[x][y][z+a]:
 			'up':
-				return solve_up(x,y,z+a,origins)
+				if solve_up(x,y,z+a,origins):
+					out = true
+				else:
+					return false
 			'down':
-				return solve_down(x,y,z+a,origins)
+				if solve_down(x,y,z+a,origins):
+					out = true
+				else:
+					return false
 			'left':
-				return solve_left(x,y,z+a,origins)
+				if solve_left(x,y,z+a,origins):
+					out = true
+				else:
+					return false
 			'right':
-				return solve_right(x,y,z+a,origins)
+				if solve_right(x,y,z+a,origins):
+					out = true
+				else:
+					return false
 			'forward':
-				return solve_forward(x,y,z+a,origins)
+				if solve_forward(x,y,z+a,origins):
+					out = true
+				else:
+					return false
 			'backward':
 				return false
-#			_:
-#				return true
-	return false
+			null:
+				out = true
+	return out
 
 func solve_backward(x,y,z,origins:Array) -> bool:
+	var out := false
 	if Vector3(x,y,z) in origins:
 		return false
 	if z == 0:
-		return true
+		out = true
 	for a in z+1:
 		if Vector3(x,y,z) not in origins:
 			origins.append(Vector3(x,y,z))
 		match object_grid[x][y][z-a-1]:
 			'up':
-				return solve_up(x,y,z-a-1,origins)
+				if solve_up(x,y,z-a-1,origins):
+					out = true
+				else:
+					return false
 			'down':
-				return solve_down(x,y,z-a-1,origins)
+				if solve_down(x,y,z-a-1,origins):
+					out = true
+				else:
+					return false
 			'left':
-				return solve_left(x,y,z-a-1,origins)
+				if solve_left(x,y,z-a-1,origins):
+					out = true
+				else:
+					return false
 			'right':
-				return solve_right(x,y,z-a-1,origins)
+				if solve_right(x,y,z-a-1,origins):
+					out = true
+				else:
+					return false
 			'forward':
 				return false
 			'backward':
-				return solve_backward(x,y,z-a-1,origins)
-#			_:
-#				return true
-	return false
+				if solve_backward(x,y,z-a-1,origins):
+					out = true
+				else:
+					return false
+			null:
+				out = true
+	return out

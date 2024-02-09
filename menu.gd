@@ -11,6 +11,7 @@ func _ready():
 		)
 
 func reveal():
+	button.disabled = false
 	var tween = create_tween()
 	tween.tween_property(self, 'position', Vector2() ,1.0).set_ease(Tween.EASE_OUT).set_trans(Tween.TRANS_EXPO)
 	tween.tween_callback(func():
@@ -18,6 +19,7 @@ func reveal():
 		)
 
 func conceal(mode:String):
+	button.disabled = true
 	var tween = create_tween()
 	tween.tween_property(self, 'position:x', -size.x ,1.0).set_ease(Tween.EASE_IN_OUT).set_trans(Tween.TRANS_EXPO)
 	tween.tween_callback(_play)
